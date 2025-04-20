@@ -37,14 +37,17 @@ const Login = ({ students, getStudents, group, setGroup }) => {
       };
       delete updatedStudentData["_id"];
       const response = await axios.put(
-        `http://localhost:3000/student/${selectedStudentData.id}`,
+        `https://fencing-prod-backend.vercel.app/student/${selectedStudentData.id}`,
         updatedStudentData
       );
       if (response.status == 200) {
         getStudents(group);
         updatedStudentData["dateTime"] = new Date();
         updatedStudentData["change"] = "status";
-        await axios.post("http://localhost:3000/history", updatedStudentData);
+        await axios.post(
+          "https://fencing-prod-backend.vercel.app/history",
+          updatedStudentData
+        );
         toast.success(`Successfully checked ${status.toLowerCase()}`);
       } else {
         toast.error.message(

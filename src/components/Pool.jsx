@@ -116,7 +116,7 @@ const Pool = ({ title, students, getStudents, group }) => {
         };
         delete updatedStudentData["_id"];
         const response = await axios.put(
-          `http://localhost:3000/student/${currentStudent.id}`,
+          `https://fencing-prod-backend.vercel.app/student/${currentStudent.id}`,
           updatedStudentData
         );
         if (response.status == 200) {
@@ -125,24 +125,24 @@ const Pool = ({ title, students, getStudents, group }) => {
           if (trackChange.status && trackChange.points) {
             updatedStudentData["change"] = "status";
             await axios.post(
-              "http://localhost:3000/history",
+              "https://fencing-prod-backend.vercel.app/history",
               updatedStudentData
             );
             updatedStudentData["change"] = "points";
             await axios.post(
-              "http://localhost:3000/history",
+              "https://fencing-prod-backend.vercel.app/history",
               updatedStudentData
             );
           } else if (trackChange.status) {
             updatedStudentData["change"] = "status";
             await axios.post(
-              "http://localhost:3000/history",
+              "https://fencing-prod-backend.vercel.app/history",
               updatedStudentData
             );
           } else if (trackChange.points) {
             updatedStudentData["change"] = "points";
             await axios.post(
-              "http://localhost:3000/history",
+              "https://fencing-prod-backend.vercel.app/history",
               updatedStudentData
             );
           }
@@ -181,7 +181,7 @@ const Pool = ({ title, students, getStudents, group }) => {
     try {
       setCurrentStudent({ ...item });
       const response = await axios.get(
-        `http://localhost:3000/history/${item.id}`
+        `https://fencing-prod-backend.vercel.app/history/${item.id}`
       );
       if (response.status == 200) {
         const uniqueDates = [

@@ -16,7 +16,7 @@ const Content = ({ flipped }) => {
   const getStudents = async (group) => {
     try {
       const response = await axios.get(
-        `http://localhost:3000/student/${group}`
+        `https://fencing-prod-backend.vercel.app/student/${group}`
       );
       if (response.status === 200) {
         const data = response.data.data;
