@@ -7,6 +7,7 @@ import {
 import GroupSelector from "./GroupSelector";
 import PoolManagement from "./PoolManagement";
 import Pool from "./Pool";
+import DynamicPools from "./DynamicPools";
 
 const Dashboard = ({ students, getStudents, group, setGroup }) => {
   const studentsOfPoolA = students.filter((student) => student.points >= 701);
@@ -37,34 +38,33 @@ const Dashboard = ({ students, getStudents, group, setGroup }) => {
         </ResizablePanel>
         <ResizableHandle withHandle className="bg-white" />
         <ResizablePanel defaultSize={70}>
-          <ResizablePanelGroup direction="horizontal">
-            <ResizablePanel defaultSize={33}>
-              <Pool
-                title="Pool A"
-                students={studentsOfPoolA}
-                getStudents={getStudents}
-                group={group}
-              />
-            </ResizablePanel>
-            <ResizableHandle withHandle className="bg-white" />
-            <ResizablePanel defaultSize={33}>
-              <Pool
-                title="Pool B"
-                students={studentsOfPoolB}
-                getStudents={getStudents}
-                group={group}
-              />
-            </ResizablePanel>
-            <ResizableHandle withHandle className="bg-white" />
-            <ResizablePanel defaultSize={33}>
-              <Pool
-                title="Pool C"
-                students={studentsOfPoolC}
-                getStudents={getStudents}
-                group={group}
-              />
-            </ResizablePanel>
-          </ResizablePanelGroup>
+          <div className="w-full h-full overflow-x-auto">
+            <div className="min-w-fit h-full flex">
+              <ResizablePanelGroup
+                direction="horizontal"
+                className="flex justify-center"
+              >
+                <DynamicPools
+                  label="Pool A"
+                  students={studentsOfPoolA}
+                  getStudents={getStudents}
+                  group={group}
+                />
+                <DynamicPools
+                  label="Pool B"
+                  students={studentsOfPoolB}
+                  getStudents={getStudents}
+                  group={group}
+                />
+                <DynamicPools
+                  label="Pool C"
+                  students={studentsOfPoolC}
+                  getStudents={getStudents}
+                  group={group}
+                />
+              </ResizablePanelGroup>
+            </div>
+          </div>
         </ResizablePanel>
       </ResizablePanelGroup>
     </div>

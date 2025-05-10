@@ -71,17 +71,15 @@ const Pool = ({ title, students, getStudents, group }) => {
     documentTitle: title,
   });
 
-  const rows = students
-    .filter((student) => student.status == "In")
-    .map((student) => student.name);
+  const rows = [...students.map((student) => student.name), "", ""];
 
   const columns = Array.from({ length: rows.length }, (_, i) => i + 1);
 
   const updatedColumns = columns.concat(["V", "V/M", "TS", "TR", "Ind"]);
   updatedColumns.unshift("");
 
-  const data = Array.from({ length: rows.length }, (_, i) => [
-    i + 1,
+  const data = Array.from({ length: rows.length + 2 }, (_, i) => [
+    i < rows.length ? i + 1 : "",
     ...Array(updatedColumns.length).fill(""),
   ]);
 
