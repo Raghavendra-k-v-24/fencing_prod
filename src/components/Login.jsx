@@ -31,6 +31,17 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { ChevronDown } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import BASE_URL from "../../config.js";
 
 const Login = ({ students, getStudents, group, setGroup }) => {
   const groups = [
@@ -42,11 +53,51 @@ const Login = ({ students, getStudents, group, setGroup }) => {
     "Comp A",
   ];
 
+  const [addStudent, setAddStudent] = useState({
+    id: null,
+    name: "",
+    points: null,
+    status: "",
+    group: "",
+  });
+
+  const handleChange = (e) => {
+    const { id, value } = e.target;
+    setAddStudent((prev) => ({
+      ...prev,
+      [id]: value,
+    }));
+  };
+
+  const handleSelectChange = (name, value) => {
+    setAddStudent((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
   const [selectedStudentId, setSelectedStudentId] = useState(null);
 
   const selectedStudentData = students.find(
     (student) => student.id == selectedStudentId
   );
+
+  const handleAddStudent = async () => {
+    try {
+      const response = await axios.post(`${BASE_URL}/student`, addStudent);
+      if (response.status == 200) {
+        toast.success("Student added successfully.");
+      } else {
+        toast.error("Error occurred while adding student.");
+      }
+    } catch (err) {
+      if (err.response.status === 400) {
+        toast.error("Student ID Exists.");
+      } else {
+        toast.error("Error occurred while adding student.");
+      }
+    }
+  };
 
   const handlePoolSelect = async (status) => {
     try {
@@ -56,17 +107,14 @@ const Login = ({ students, getStudents, group, setGroup }) => {
       };
       delete updatedStudentData["_id"];
       const response = await axios.put(
-        `https://fencing-prod-backend.vercel.app/student/${selectedStudentData.id}`,
+        `${BASE_URL}/student/${selectedStudentData.id}`,
         updatedStudentData
       );
       if (response.status == 200) {
         getStudents(group);
         updatedStudentData["dateTime"] = new Date();
         updatedStudentData["change"] = "status";
-        await axios.post(
-          "https://fencing-prod-backend.vercel.app/history",
-          updatedStudentData
-        );
+        await axios.post(`${BASE_URL}/history`, updatedStudentData);
         toast.success(`Successfully checked ${status.toLowerCase()}`);
       } else {
         toast.error.message(
@@ -80,31 +128,6 @@ const Login = ({ students, getStudents, group, setGroup }) => {
     }
   };
   const [open, setOpen] = React.useState(false);
-  const [value, setValue] = React.useState("");
-  const frameworks = [
-    {
-      value: "next.js",
-      label: "Next.js",
-    },
-    {
-      value: "sveltekit",
-      label: "SvelteKit",
-    },
-    {
-      value: "nuxt.js",
-      label: "Nuxt.js",
-    },
-    {
-      value: "remix",
-      label: "Remix",
-    },
-    {
-      value: "astro",
-      label: "Astro",
-    },
-  ];
-
-  console.log(selectedStudentId);
 
   return (
     <div className="size-full flex flex-col justify-center items-center gap-5">
@@ -156,7 +179,7 @@ const Login = ({ students, getStudents, group, setGroup }) => {
               <Command>
                 <CommandInput placeholder="Search student" className="h-9" />
                 <CommandList>
-                  <CommandEmpty>No framework found.</CommandEmpty>
+                  <CommandEmpty>No student found.</CommandEmpty>
                   <CommandGroup>
                     {students.map((student) => (
                       <CommandItem
@@ -169,14 +192,6 @@ const Login = ({ students, getStudents, group, setGroup }) => {
                         className={student.status == "In" && "bg-green-50"}
                       >
                         {student.name}
-                        <Check
-                          className={cn(
-                            "ml-auto",
-                            value === student.value
-                              ? "opacity-100"
-                              : "opacity-0"
-                          )}
-                        />
                       </CommandItem>
                     ))}
                   </CommandGroup>
@@ -186,29 +201,139 @@ const Login = ({ students, getStudents, group, setGroup }) => {
           </Popover>
         </div>
       </div>
-      <div className="flex gap-5">
-        <Button
-          className="w-[150px] h-[50px] text-xl"
-          disabled={
-            selectedStudentData && selectedStudentData.status == "Out"
-              ? false
-              : true
-          }
-          onClick={() => handlePoolSelect("In")}
-        >
-          Check In
-        </Button>
-        <Button
-          className="w-[150px] h-[50px] bg-red-700 text-xl hover:bg-red-600"
-          disabled={
-            selectedStudentData && selectedStudentData.status == "In"
-              ? false
-              : true
-          }
-          onClick={() => handlePoolSelect("Out")}
-        >
-          Check Out
-        </Button>
+      <div className="flex flex-col gap-3">
+        <div className="flex gap-5">
+          <Button
+            className="w-[150px] h-[50px] text-xl"
+            disabled={
+              selectedStudentData && selectedStudentData.status == "Out"
+                ? false
+                : true
+            }
+            onClick={() => handlePoolSelect("In")}
+          >
+            Check In
+          </Button>
+          <Button
+            className="w-[150px] h-[50px] bg-red-700 text-xl hover:bg-red-600"
+            disabled={
+              selectedStudentData && selectedStudentData.status == "In"
+                ? false
+                : true
+            }
+            onClick={() => handlePoolSelect("Out")}
+          >
+            Check Out
+          </Button>
+        </div>
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button className="w-full h-[50px] text-xl bg-neutral-800">
+              Add Student
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Add Student</DialogTitle>
+              <DialogDescription>
+                Add a new student here. Click save when you're done.
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="name" className="text-right">
+                  Id
+                </Label>
+                <Input
+                  id="id"
+                  type="number"
+                  value={addStudent.id || ""}
+                  className="col-span-3"
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="name" className="text-right">
+                  Name
+                </Label>
+                <Input
+                  id="name"
+                  value={addStudent.name}
+                  className="col-span-3"
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="points" className="text-right">
+                  Points
+                </Label>
+                <Input
+                  id="points"
+                  value={addStudent.points || ""}
+                  className="col-span-3"
+                  type="number"
+                  min="0"
+                  max="1000"
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="status" className="text-right">
+                  Status
+                </Label>
+                <Select
+                  value={addStudent.status}
+                  id="status"
+                  onValueChange={(value) => handleSelectChange("status", value)}
+                >
+                  <SelectTrigger className="col-span-3 w-full">
+                    <SelectValue placeholder="Select status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectItem value="In">In</SelectItem>
+                      <SelectItem value="Out">Out</SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="groupSelector" className="text-right">
+                  Group
+                </Label>
+                <Select
+                  id="groupSelector"
+                  value={addStudent.group}
+                  onValueChange={(value) => handleSelectChange("group", value)}
+                >
+                  <SelectTrigger className="col-span-3 w-full">
+                    <SelectValue placeholder="Select a Group" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      {groups.map((name) => (
+                        <SelectItem value={name} key={name}>
+                          {name}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <DialogFooter>
+              <Button
+                type="submit"
+                className="w-[120px]"
+                onClick={handleAddStudent}
+              >
+                Add
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );

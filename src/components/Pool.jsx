@@ -57,6 +57,7 @@ import {
 } from "@/components/ui/chart";
 import PlaceHolder from "./PlaceHolder";
 import { toast } from "sonner";
+import BASE_URL from "../../config.js";
 
 const Pool = ({ title, students, getStudents, group }) => {
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -114,7 +115,7 @@ const Pool = ({ title, students, getStudents, group }) => {
         };
         delete updatedStudentData["_id"];
         const response = await axios.put(
-          `https://fencing-prod-backend.vercel.app/student/${currentStudent.id}`,
+          `${BASE_URL}/student/${currentStudent.id}`,
           updatedStudentData
         );
         if (response.status == 200) {
@@ -122,27 +123,15 @@ const Pool = ({ title, students, getStudents, group }) => {
           updatedStudentData["dateTime"] = new Date();
           if (trackChange.status && trackChange.points) {
             updatedStudentData["change"] = "status";
-            await axios.post(
-              "https://fencing-prod-backend.vercel.app/history",
-              updatedStudentData
-            );
+            await axios.post(`${BASE_URL}/history`, updatedStudentData);
             updatedStudentData["change"] = "points";
-            await axios.post(
-              "https://fencing-prod-backend.vercel.app/history",
-              updatedStudentData
-            );
+            await axios.post(`${BASE_URL}/history`, updatedStudentData);
           } else if (trackChange.status) {
             updatedStudentData["change"] = "status";
-            await axios.post(
-              "https://fencing-prod-backend.vercel.app/history",
-              updatedStudentData
-            );
+            await axios.post(`${BASE_URL}/history`, updatedStudentData);
           } else if (trackChange.points) {
             updatedStudentData["change"] = "points";
-            await axios.post(
-              "https://fencing-prod-backend.vercel.app/history",
-              updatedStudentData
-            );
+            await axios.post(`${BASE_URL}/history`, updatedStudentData);
           }
           toast.success("Data updated successfully.");
           setTrackChange({
@@ -178,9 +167,9 @@ const Pool = ({ title, students, getStudents, group }) => {
   const handleViewData = async (item) => {
     try {
       setCurrentStudent({ ...item });
-      const response = await axios.get(
-        `https://fencing-prod-backend.vercel.app/history/${item.id}`
-      );
+      console.log(`${BASE_URL}/history/${item.id}`);
+      const response = await axios.get(`${BASE_URL}/history/${item.id}`);
+      console.log(response);
       if (response.status == 200) {
         const uniqueDates = [
           ...new Set(
@@ -203,10 +192,10 @@ const Pool = ({ title, students, getStudents, group }) => {
         setChartData(updatedChartData);
         setTableData(updatedTableData);
       } else {
-        toast.error("Error occurred fetching history.");
+        toast.error("Error occurred while fetching history.");
       }
     } catch (err) {
-      toast.error("Error occurred fetching history.");
+      toast.error("Error occurred while fetching history.");
     }
   };
 

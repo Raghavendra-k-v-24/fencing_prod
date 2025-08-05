@@ -4,6 +4,7 @@ import axios from "axios";
 import Dashboard from "./Dashboard";
 import ReactCardFlip from "react-card-flip";
 import { toast } from "sonner";
+import BASE_URL from "../../config.js";
 
 const Content = ({ flipped }) => {
   const [students, setStudents] = useState([]);
@@ -15,9 +16,7 @@ const Content = ({ flipped }) => {
 
   const getStudents = async (group) => {
     try {
-      const response = await axios.get(
-        `https://fencing-prod-backend.vercel.app/student/${group}`
-      );
+      const response = await axios.get(`${BASE_URL}/student/${group}`);
       if (response.status === 200) {
         const data = response.data.data;
         data.sort((a, b) => {
