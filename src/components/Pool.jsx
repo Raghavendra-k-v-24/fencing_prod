@@ -167,9 +167,7 @@ const Pool = ({ title, students, getStudents, group }) => {
   const handleViewData = async (item) => {
     try {
       setCurrentStudent({ ...item });
-      console.log(`${BASE_URL}/history/${item.id}`);
       const response = await axios.get(`${BASE_URL}/history/${item.id}`);
-      console.log(response);
       if (response.status == 200) {
         const uniqueDates = [
           ...new Set(

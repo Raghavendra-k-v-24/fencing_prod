@@ -2,6 +2,10 @@ import React from "react";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import PoolCount from "./PoolCount";
+import { Button } from "@/components/ui/button";
+import axios from "axios";
+import BASE_URL from "../../config";
+import { toast } from "sonner";
 
 const PoolManagement = ({
   students,
@@ -39,6 +43,19 @@ const PoolManagement = ({
   ).length;
   const numberOfStudentsPoolCOut =
     numberOfStudentsPoolC - numberOfStudentsPoolCIn;
+
+  const handleCheckOutAll = async () => {
+    try {
+      const response = await axios.get(`${BASE_URL}/checkout`);
+      if (response.status == 200) {
+        toast.success("Checked Out everyone successfully.");
+      } else {
+        toast.error("Error occurred while checking everyone out.");
+      }
+    } catch (err) {
+      toast.error("Error occurred while checking everyone out.");
+    }
+  };
 
   return (
     <div className="size-full flex">
@@ -81,6 +98,12 @@ const PoolManagement = ({
             numberOfStudentsOut={numberOfStudentsPoolCOut}
           />
         </div>
+        <Button
+          className="w-[150px] h-[30px] text-xs bg-red-600 hover:bg-red-500"
+          onClick={() => handleCheckOutAll()}
+        >
+          Checkout All
+        </Button>
       </div>
     </div>
   );

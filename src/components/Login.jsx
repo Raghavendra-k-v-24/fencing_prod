@@ -54,7 +54,6 @@ const Login = ({ students, getStudents, group, setGroup }) => {
   ];
 
   const [addStudent, setAddStudent] = useState({
-    id: null,
     name: "",
     points: null,
     status: "",
@@ -91,11 +90,7 @@ const Login = ({ students, getStudents, group, setGroup }) => {
         toast.error("Error occurred while adding student.");
       }
     } catch (err) {
-      if (err.response.status === 400) {
-        toast.error("Student ID Exists.");
-      } else {
-        toast.error("Error occurred while adding student.");
-      }
+      toast.error("Error occurred while adding student.");
     }
   };
 
@@ -241,18 +236,6 @@ const Login = ({ students, getStudents, group, setGroup }) => {
             </DialogHeader>
 
             <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="name" className="text-right">
-                  Id
-                </Label>
-                <Input
-                  id="id"
-                  type="number"
-                  value={addStudent.id || ""}
-                  className="col-span-3"
-                  onChange={handleChange}
-                />
-              </div>
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="name" className="text-right">
                   Name
